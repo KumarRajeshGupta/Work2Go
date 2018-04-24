@@ -1,0 +1,6 @@
+framework module Pods_Work2go {
+  umbrella header "Pods-Work2go-umbrella.h"
+
+  export *
+  module * { export * }
+}
