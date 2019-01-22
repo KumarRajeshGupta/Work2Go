@@ -9,6 +9,7 @@
 import UIKit
 
 
+
 extension HomeViewController : UITableViewDelegate , UITableViewDataSource{
     
     //MARK:
@@ -16,7 +17,7 @@ extension HomeViewController : UITableViewDelegate , UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat{
         
-        if isClicked == "searchWithoutContent" {
+        if isHomeContentBy == "searchWithoutContent" {
             return searchHeader1.frame.size.height
         }
         else{
@@ -28,7 +29,7 @@ extension HomeViewController : UITableViewDelegate , UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
-        if isClicked == "searchWithoutContent" {
+        if isHomeContentBy == "searchWithoutContent" {
             
             searchHeader1.isHidden = false
             searchHeader.isHidden = true
@@ -43,7 +44,9 @@ extension HomeViewController : UITableViewDelegate , UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return jobList.count
     }
-  
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{
         
@@ -58,6 +61,8 @@ extension HomeViewController : UITableViewDelegate , UITableViewDataSource{
         return cell
     }
        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        
         
         let job = self.storyboard?.instantiateViewController(withIdentifier: "jobdetails") as! JobDetailsViewController
         job.job_id = self.jobList[indexPath.row].id

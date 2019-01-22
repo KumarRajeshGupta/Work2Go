@@ -33,8 +33,8 @@ let feedback: String = "feedback.php"
 let server_error = "There is a problem with our system. We apologize for the inconvenience caused. Please try again later. If the problem persist, please contact at support@work2go.com."
 let network_error = "There is no internet connection. Please try again later."
 
-let baseURL = "http://demo2.mediatrenz.com/worktogo-apps/Api/"
-
+//let baseURL = "http://demo2.mediatrenz.com/worktogo-apps/Api/"
+let baseURL = "http://work2go.info/Api/"
 
 
 
@@ -139,13 +139,13 @@ class ServerHandler: NSObject {
     }
     
     
-    func getResponseUploadImageApi(parametrs : NSDictionary,imgData:Data, completion: @escaping (_ ress: [String : Any])->()) {
+    func getResponseUploadImageApi(parametrs : NSDictionary,imgData:Data,imagekey:String,serviceName:String, completion: @escaping (_ ress: [String : Any])->()) {
         
         
          if Connectivity.isConnectedToInternet() {
              self.sdLoader.startAnimating(atView: (UIApplication.shared.keyWindow?.rootViewController?.view)!)
-            
-            let _url = "\(baseURL)edit_image.php"
+            //
+            let _url = "\(baseURL)\(serviceName)"
             print("request : ",_url, "\n params: ",parametrs)
             
             let headers: HTTPHeaders = [
@@ -156,7 +156,7 @@ class ServerHandler: NSObject {
                 for (key, value) in parametrs {
                     multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key as! String)
                 }
-                multipartFormData.append(imgData, withName: "file" as String, fileName: "profile_pic.png", mimeType: "image/png")
+                multipartFormData.append(imgData, withName: imagekey as String, fileName: "profile_pic.png", mimeType: "image/png")
                 
             }, usingThreshold: UInt64.init(), to: _url, method: .post, headers: headers) { (result) in
                 switch result{

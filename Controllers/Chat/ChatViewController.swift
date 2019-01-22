@@ -23,8 +23,6 @@ struct chatModel {
     let time : String?
     let type : String?
     let owner : String?
-    
-    
 }
 
 
@@ -52,24 +50,27 @@ class ChatViewController: UIViewController, UITableViewDelegate , UITableViewDat
    
     func updateInModel(list:[[String:Any]]){
         
+        let details = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())
         self.chatList = []
         if list.count > 0{
             list.forEach{
-                self.chatList.append(chatModel(
-                    job_id : $0["job_id"] as? String,
-                    job_title:  $0["job_title"] as? String,
-                    message_id:  $0["message_id"] as? String,
-                    message:  $0["message"] as? String,
-                    sender_id:   $0["sender_id"] as? String,
-                    sender_name:  $0["sender_name"] as? String,
-                    sender_image:  $0["sender_image"] as? String,
-                    receiver_id:  $0["receiver_id"] as? String,
-                    receiver_name:  $0["receiver_name"] as? String,
-                    receiver_image:  $0["receiver_image"] as? String,
-                    time:  $0["time"] as? String,
-                    type: $0["type"] as? String,
-                    owner: $0["owner"] as? String
-                ))
+                if $0["receiver_id"] as! String != details.user_id! {
+                    self.chatList.append(chatModel(
+                        job_id : $0["job_id"] as? String,
+                        job_title:  $0["job_title"] as? String,
+                        message_id:  $0["message_id"] as? String,
+                        message:  $0["message"] as? String,
+                        sender_id:   $0["sender_id"] as? String,
+                        sender_name:  $0["sender_name"] as? String,
+                        sender_image:  $0["sender_image"] as? String,
+                        receiver_id:  $0["receiver_id"] as? String,
+                        receiver_name:  $0["receiver_name"] as? String,
+                        receiver_image:  $0["receiver_image"] as? String,
+                        time:  $0["time"] as? String,
+                        type: $0["type"] as? String,
+                        owner: $0["owner"] as? String
+                    ))
+                }
             }
             print(self.chatList)
             self.tableview.reloadData()
@@ -114,10 +115,12 @@ class ChatViewController: UIViewController, UITableViewDelegate , UITableViewDat
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "chathistory") as! ChatHistoryViewController
-        vc.jobID = self.chatList[indexPath.row].job_id!
-        vc.postedByID = self.chatList[indexPath.row].receiver_id!
-        vc.nameee = self.chatList[indexPath.row].receiver_name!
-        vc.companyNameeee = self.chatList[indexPath.row].job_title!
+        
+        UserDefaults.standard.set(self.chatList[indexPath.row].job_id!, forKey: "job_id")
+        UserDefaults.standard.set(self.chatList[indexPath.row].receiver_id!, forKey: "receiver_id")
+        UserDefaults.standard.set(self.chatList[indexPath.row].receiver_name!, forKey: "receiver_name")
+        UserDefaults.standard.set(self.chatList[indexPath.row].job_title!, forKey: "job_title")
+
         self.navigationController?.pushViewController(vc, animated: true)
         
     }

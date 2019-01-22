@@ -10,6 +10,8 @@ import UIKit
 import MapKit
 
 
+
+
 class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerViewDataSource {
 
     
@@ -35,7 +37,7 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
     
     @IBOutlet var searchHeader: UIView!
     @IBOutlet var searchHeader1: UIView!
-    var isClicked : String = "searchWithoutContent"
+    
     
     let service = ServerHandler()
     
@@ -48,7 +50,7 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
     
     
     var locManager = CLLocationManager()
-    var currentLocation: CLLocation!
+    var currentLocation: CLLocation?
     
     var currentLat : String = ""
     var currentLng : String = ""
@@ -59,6 +61,9 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.tableview.estimatedRowHeight = 80
+        self.tableview.rowHeight = UITableViewAutomaticDimension
         
         postedJobBtn.isHidden = true
         if UserDefaults.standard.isLoggedIn(){
@@ -75,41 +80,50 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
         DispatchQueue.main.async {
             self.getPickerData()
         }
-        
         locManager.requestWhenInUseAuthorization()
         
         if (CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedWhenInUse ||
             CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedAlways){
             currentLocation = locManager.location
            
-            currentLat = "\(currentLocation.coordinate.latitude)"
-            currentLng = "\(currentLocation.coordinate.longitude)"
-            
-            print(currentLocation.coordinate.latitude)
-            print(currentLocation.coordinate.longitude)
-        }
-        
-        
-        if UserDefaults.standard.isLoggedIn() {
-            let userData = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())
-            print(userData)
-            get_user_id = userData.user_id!
-            if userData.country_name == "" {
-                let profile = self.storyboard?.instantiateViewController(withIdentifier: "profile")
-                self.navigationController?.pushViewController(profile!, animated: true)
-            }else{
-                self.getHomeData()
+            if let lat = currentLocation?.coordinate.latitude{
+              currentLat = "\(lat)"
             }
             
-        }else{
-            self.getHomeData()
+            if let lng = currentLocation?.coordinate.longitude{
+               currentLng = "\(lng)"
+            }
+
         }
+        
+       
    
     }
     
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if UserDefaults.standard.isLoggedIn() {
+            let userData = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())
+            get_user_id = userData.user_id!
+            if userData.country_name == "" {
+                let profile = self.storyboard?.instantiateViewController(withIdentifier: "profile")
+                self.navigationController?.pushViewController(profile!, animated: true)
+            }else{
+                self.getResponseHomeData()
+            }
+        }else{
+            self.getResponseHomeData()
+        }
+        
+        
+    }
+    
+    func getResponseHomeData() {
+        if isHomeContentBy == "searchWithoutContent" {
+            self.getHomeData()
+        }
     }
     
     //MARK:
@@ -138,32 +152,15 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
             self.tableview.reloadData()
         }
         
-        
-        if UserDefaults.standard.isLoggedIn() {
-            deviceRegisterOnServer()
-        }
-        
     }
     
-    func deviceRegisterOnServer(){
-       
-        service.getResponseFromServer(parametrs: "push_device_registration.php?user_id=\(get_user_id)&&token_id=\( UserDefaults.standard.getToken())&&device_type=iOS&&device_id=\(UserDefaults.standard.getDeviceID())") { (results) in
-            let status = results["status"] as? String ?? ""
-            if status == "1"{
-                print("Successfully device registered on server")
-            }
-            else{
-               print("failed")
-                
-            }
-        }
-    }
+    
     
     
     func getHomeData()  {
         
-        if isClicked == "searchWithoutContent" {
-            service.getResponseFromServer(parametrs: "nearby_search.php?user_id=\(get_user_id)&&lat=\("28.620764")&&lng=\("77.363930")") { (results) in
+        if isHomeContentBy == "searchWithoutContent" {
+            service.getResponseFromServer(parametrs: "nearby_search.php?user_id=\(get_user_id)&&lat=\(currentLat)&&lng=\(currentLng)") { (results) in
                 let status = results["status"] as? String ?? ""
                 if status == "1"{
                     let list = results["job_list"] as! [[String:Any]]
@@ -215,13 +212,14 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
     }
     
     @IBAction func searchHeaderBtnAction1(_ sender: Any) {
-        isClicked = "searchWithContent"
-         self.getHomeData()
+        isHomeContentBy = "searchWithContent"
+        self.tableview.reloadData()
+        
         
     }
     @IBAction func searchHeaderBtnAction(_ sender: Any) {
-        isClicked = "searchWithoutContent"
-        self.getHomeData()
+        isHomeContentBy = "searchWithoutContent"
+        self.tableview.reloadData()
     }
     
     @IBAction func countryBtnAction(_ sender: Any) {
@@ -302,27 +300,25 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
             Helper.showSnackBar(with: "Select your country")
             return
         }
-        else if (stateField.text?.isEmpty)! {
-            Helper.showSnackBar(with: "Select your state")
-            return
-        }
-        else if (cityField.text?.isEmpty)! {
-            Helper.showSnackBar(with: "Select your city")
-            return
-        }
-        else if (jobTypeField.text?.isEmpty)! {
-            Helper.showSnackBar(with: "Select your job type")
-            return
-        }
-        else if (serviceTypeField.text?.isEmpty)! {
-            Helper.showSnackBar(with: "Select your service type")
-            return
-        }
-
+//        else if (stateField.text?.isEmpty)! {
+//            Helper.showSnackBar(with: "Select your state")
+//            return
+//        }
+//        else if (cityField.text?.isEmpty)! {
+//            Helper.showSnackBar(with: "Select your city")
+//            return
+//        }
+//        else if (jobTypeField.text?.isEmpty)! {
+//            Helper.showSnackBar(with: "Select your job type")
+//            return
+//        }
+//        else if (serviceTypeField.text?.isEmpty)! {
+//            Helper.showSnackBar(with: "Select your service type")
+//            return
+//        }
         
         self.getHomeData()
        
-        
     }
   
     @IBAction func postedJobBtnAction(_ sender: Any) {
@@ -367,6 +363,8 @@ class HomeViewController: UIViewController , UIPickerViewDelegate , UIPickerView
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int){
+        
+
         jobTypeField.text = pickerData[row]["name"] as? String ?? ""
         job_type_id = pickerData[row]["id"] as? String ?? ""
     }

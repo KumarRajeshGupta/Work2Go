@@ -17,7 +17,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>1.15</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -26,15 +26,21 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>We needs camera permission to capture image
+	<string>Work2Go app would like to access your photo gallery for your profile photo upload
 </string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>need location</string>
+	<string>Work2Go app needs to allow your device current location permission so that you find the all nearest post job. </string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>need location</string>
+	<string>Work2Go app needs to allow your device current location permission so that you find the all nearest post job. </string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We needs gallery permission to capture image
+	<string>Work2Go app would like to access your photo gallery for your profile photo upload
 </string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

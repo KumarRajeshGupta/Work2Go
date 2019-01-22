@@ -12,7 +12,7 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
 
     
     @IBOutlet weak var tabbar: UITabBar!
-    
+    var userData : userModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +32,11 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
         super.viewWillAppear(animated)
   
         if (UserDefaults.standard.isLoggedIn() == false) {
-            
             self.selectedIndex = 0
+        }
+        
+        DispatchQueue.main.async {
+            self.getBadgeCount()
         }
     }
 
@@ -42,6 +45,7 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
       
          let tabBarIndex = tabBarController.selectedIndex
+         isHomeContentBy = "searchWithoutContent"
       
         if (UserDefaults.standard.isLoggedIn() == false) {
             
@@ -50,9 +54,26 @@ class TabBarViewController: UITabBarController , UITabBarControllerDelegate {
                 let root = self.storyboard?.instantiateViewController(withIdentifier: "signin") as? SignInViewController
                 self.navigationController?.pushViewController(root ?? UIViewController(), animated: true)
             }
-            
         }
-  
+        DispatchQueue.main.async {
+            self.getBadgeCount()
+        }
     }
-
+    
+    func getBadgeCount() {
+        if UserDefaults.standard.isLoggedIn() {
+            userData = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())
+            ServerHandler().getResponseFromServer(parametrs: "read_chat_count.php?user_id=\(userData.user_id!)", completion: { (results) in
+                let chat_count = results["chat_count"] as? String ?? ""
+                
+                if chat_count != "0" {
+                    self.tabBar.items?[2].badgeValue = chat_count
+                }else{
+                    self.tabBar.items?[2].badgeValue = nil
+                }
+            })
+        }
+    }
+    
+    
 }

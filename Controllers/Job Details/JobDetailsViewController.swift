@@ -27,14 +27,16 @@ class JobDetailsViewController: UIViewController {
     @IBOutlet weak var jobDesc: UILabel!
     @IBOutlet weak var skills: UILabel!
     @IBOutlet weak var jobType: UILabel!
-    
-    var isApplied = ""
+    @IBOutlet weak var deleteBtn: UIButton!
     
     var isFrom = ""
     
-    var jobID = ""
-    var receiverID = ""
+    var jobDetails : JobDetailModel! = nil
+    var employeeData :[EmployeeModel] = [EmployeeModel]()
     
+
+    @IBOutlet weak var appliedEmpTable: UITableView!
+    @IBOutlet weak var appliedEmpView: UIView!
     
     
     @IBOutlet weak var applyBtn: UIButton!
@@ -43,72 +45,35 @@ class JobDetailsViewController: UIViewController {
         
         self.applyBtn.isHidden = true
         postedUserView.isHidden = true
+        deleteBtn.isHidden = true
+        appliedEmpView.isHidden = true
         
-        service.getResponseFromServer(parametrs: "applied_person_list.php?user_id=\(user_id)&&job_id=\(job_id)") { (results) in
-            
-            let status = results["status"] as? String ?? ""
-            if status == "1"{
-               
-                let dictData = results["job_list"] as! [String : Any]
-                
-                self.jobName.text = dictData["name"] as? String ?? ""
-                self.companyName.text = "\(dictData["company_name"] as? String ?? ""), \(dictData["country"] as? String ?? "")"
-                self.address.text = "\(dictData["city"] as? String ?? ""), \(dictData["state"] as? String ?? "")"
-                self.date.text = dictData["posted_date"] as? String ?? ""
-                
-                
-                self.jobDesc.text = dictData["description"] as? String ?? ""
-                self.skills.text = dictData["skill_need"] as? String ?? ""
-                self.jobType.text = dictData["job_type"] as? String ?? ""
-                
-                self.postedUserName.text = dictData["company_name"] as? String ?? ""
-                self.userImg.sd_setImage(with: URL(string: dictData["sender_image"] as? String ?? ""), placeholderImage: UIImage(named: "placeholder"))
-                
-                
-                self.jobID = dictData["id"] as? String ?? ""
-                self.receiverID = dictData["sender_id"] as? String ?? ""
-                
-                self.isApplied = dictData["applied"] as? String ?? ""
-                
-                self.applyBtn.backgroundColor = Helper.hexStringToUIColor(hex: "fda567")
-                self.applyBtn.setTitle("Apply", for: .normal)
-                
-                if self.isApplied == "1"{
-                    
-                    self.applyBtn.backgroundColor = Helper.hexStringToUIColor(hex: "980202")
-                    self.applyBtn.setTitle("Already Applied", for: .normal)
-                }
-                
-                let postedBy = dictData["sender_id"] as? String ?? ""
-                if postedBy == self.user_id {
-                    self.applyBtn.isHidden = true
-                    self.postedUserView.isHidden = true
-                }else{
-                    self.applyBtn.isHidden = false
-                    self.postedUserView.isHidden = false
-                }
-                
-                
-                if self.isFrom == "classified" {
-                   self.applyBtn.isHidden = true
-                   self.postedUserView.isHidden = true
-                }
-                
-                
-            }else{
-                Helper.showSnackBar(with: results["message"] as? String ?? "")
-            }
-        }
+        self.appliedEmpTable.register(UINib.init(nibName: "AppliedEmployeeTableViewCell", bundle: nil), forCellReuseIdentifier: AppliedEmployeeTableViewCell.reuseId)
+        
+        getDetails()
+        
 
     }
-
+    
+    
+    @IBAction func deleteJobBtnAction(_ sender: UIButton) {
+        AJAlertController.initialization().showAlert(aStrMessage: "Are you sure you want to delete this job?", aCancelBtnTitle: "NO", aOtherBtnTitle: "YES") { (index, title) in
+            print(index,title)
+            if index == 1{
+               self.deleteJob()
+            }
+        }
+    }
+    
     @IBAction func chatBtnAction(_ sender: Any) {
         if UserDefaults.standard.isLoggedIn() {
             let vc = self.storyboard?.instantiateViewController(withIdentifier: "chathistory") as! ChatHistoryViewController
-            vc.jobID = self.jobID
-            vc.postedByID = self.receiverID
-            vc.nameee = self.companyName.text!
-            vc.companyNameeee = self.jobName.text!
+            
+            UserDefaults.standard.set(self.jobDetails.jobId, forKey: "job_id")
+            UserDefaults.standard.set(self.jobDetails.senderId, forKey: "receiver_id")
+            UserDefaults.standard.set(self.companyName.text!, forKey: "receiver_name")
+            UserDefaults.standard.set(self.jobName.text!, forKey: "job_title")
+            
             self.navigationController?.pushViewController(vc, animated: true)
         }else{
             let root = self.storyboard?.instantiateViewController(withIdentifier: "signin") as? SignInViewController
@@ -124,29 +89,13 @@ class JobDetailsViewController: UIViewController {
         
         if UserDefaults.standard.isLoggedIn() {
             
-            if self.isApplied != "1"{
-                
-                let params : [String :Any] = ["user_id":user_id,
-                                              "job_id":job_id]
-                
-                service.getResponseFromServerByPostMethod(parametrs: params, url: "apply_job.php", completion: { (results) in
-                    
-                    let status = results["status"] as? String ?? ""
-                    if status == "1"{
-                        print(status)
-                        AJAlertController.initialization().showAlertWithOkButton(aStrMessage: results["message"] as? String ?? "") { (index, title) in
-                            print(index,title)
-                            
-                            let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
-                            self.navigationController!.popToViewController(viewControllers[viewControllers.count - 3], animated: true)
-                        }
-                        
-                    }else{
-                        Helper.showSnackBar(with: results["message"] as? String ?? "")
-                    }
-                    
-                })
+            if jobDetails.isApplied == "0" && jobDetails.senderId != self.user_id{
+                self.applyJob()
             }
+            else if jobDetails.senderId == self.user_id && jobDetails.job_filled == "0"{
+                self.filledJob()
+            }
+            
         }else{
             let root = self.storyboard?.instantiateViewController(withIdentifier: "signin") as? SignInViewController
             self.navigationController?.pushViewController(root ?? UIViewController(), animated: true)

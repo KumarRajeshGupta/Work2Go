@@ -14,6 +14,7 @@ pod 'DPDropDownMenu'
 pod 'GoogleSignIn'
  pod 'Firebase/Core'
  pod 'Firebase/Messaging'
+pod 'RNNotificationView'
 
   # Pods for Work2go
 

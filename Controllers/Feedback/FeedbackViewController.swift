@@ -23,8 +23,8 @@ class FeedbackViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        messege.layer.borderColor = UIColor.white.cgColor
-        messege.layer.borderWidth = 1.0
+//        messege.layer.borderColor = UIColor.white.cgColor
+//        messege.layer.borderWidth = 1.0
         
         
         let user_data = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())

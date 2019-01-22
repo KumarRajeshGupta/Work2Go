@@ -59,6 +59,9 @@ class SignInViewController: UIViewController {
                 print(userData)
              
                 UserDefaults.standard.setLoggedIn(value: true)
+                DispatchQueue.main.async {
+                    RegisterFCM().saveFcmTokenOnLogin()
+                }
                 
                 let login = self.storyboard?.instantiateViewController(withIdentifier: "tabbar")
                 self.navigationController?.pushViewController(login!, animated: true)

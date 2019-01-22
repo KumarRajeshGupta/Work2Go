@@ -9,6 +9,28 @@
 import UIKit
 import IQKeyboardManagerSwift
 
+
+extension PostNewJobViewController : UITextFieldDelegate{
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range:NSRange, replacementString string: String) -> Bool{
+    
+        if textField == self.exp {
+            let currentCharacterCount = textField.text?.count ?? 0
+            if (range.length + range.location > currentCharacterCount){
+                return false
+            }
+            let newLength = currentCharacterCount + string.count - range.length
+            return newLength <= 2
+
+        }
+        return true
+    }
+
+}
+
+
+
+
+
 class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPickerViewDataSource {
     @IBOutlet weak var descView: UIView!
     @IBOutlet weak var textView: IQTextView!
@@ -41,9 +63,9 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
     var jobTypePickerView: UIPickerView!
     var jobType_id = ""
     
-    var experienceData = ["Fresher","<1","2","3","4","5","6","7","8","9","10"]
-    var experiencePickerView: UIPickerView!
-    var experience_id = ""
+    //var experienceData = ["Fresher","<1","2","3","4","5","6","7","8","9","10"]
+    //var experiencePickerView: UIPickerView!
+    //var experience_id = ""
     
     
     var country_id : String = ""
@@ -53,8 +75,6 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-       Helper.border(descView)
         
         
         service.getResponseFromServer(parametrs: "select_category.php") { (results) in
@@ -90,14 +110,14 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
             self.jobType.inputView = self.jobTypePickerView
         }
         
-        DispatchQueue.main.async {
-            
-            self.experiencePickerView = UIPickerView()
-            self.experiencePickerView.dataSource = self
-            self.experiencePickerView.delegate = self
-            self.exp.inputView = self.experiencePickerView
-            
-        }
+//        DispatchQueue.main.async {
+//
+//            self.experiencePickerView = UIPickerView()
+//            self.experiencePickerView.dataSource = self
+//            self.experiencePickerView.delegate = self
+//            self.exp.inputView = self.experiencePickerView
+//
+//        }
         
         
 
@@ -138,7 +158,7 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
             return
         }
         else if (exp.text?.isEmpty)! {
-            Helper.showSnackBar(with: "Please select experience")
+            Helper.showSnackBar(with: "Please fill the experience")
             return
         }
         else if (country.text?.isEmpty)! {
@@ -285,9 +305,9 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
         else if pickerView == self.jobTypePickerView {
             return jobTypeData.count
         }
-        else if pickerView == self.experiencePickerView {
-            return experienceData.count
-        }
+//        else if pickerView == self.experiencePickerView {
+//            return experienceData.count
+//        }
         
         return 0
     }
@@ -303,9 +323,9 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
         else if pickerView == self.jobTypePickerView {
             return jobTypeData[row]["name"] as? String ?? ""
         }
-        else if pickerView == self.experiencePickerView {
-            return experienceData[row]
-        }
+//        else if pickerView == self.experiencePickerView {
+//            return experienceData[row]
+//        }
         
         return ""
     }
@@ -342,11 +362,11 @@ class PostNewJobViewController: UIViewController , UIPickerViewDelegate , UIPick
             jobType.text = jobTypeData[row]["name"] as? String ?? ""
             jobType_id = jobTypeData[row]["id"] as? String ?? ""
         }
-        else if pickerView == self.experiencePickerView {
-            
-            exp.text = experienceData[row]
-            experience_id = experienceData[row]
-        }
+//        else if pickerView == self.experiencePickerView {
+//
+//            exp.text = experienceData[row]
+//            experience_id = experienceData[row]
+//        }
         
         
     }

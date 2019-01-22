@@ -102,6 +102,7 @@ class SignUpViewController: UIViewController , CountryListDelegate {
                 print(status)
                 AJAlertController.initialization().showAlertWithOkButton(aStrMessage: results["message"] as? String ?? "") { (index, title) in
                     print(index,title)
+                    
                     let viewControllers: [UIViewController] = self.navigationController!.viewControllers
                     for aViewController in viewControllers {
                         if aViewController is SignInViewController {

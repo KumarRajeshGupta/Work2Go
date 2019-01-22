@@ -33,7 +33,7 @@ class AccountViewController: UIViewController , UITableViewDelegate , UITableVie
     var userData : userModel!
     
 
-    var accountData = ["My Account","My Posted Jobs","My Applied Job","My Favourites","Change Password","Terms and Conditions","Feedback","Log Out"]
+    var accountData = ["My Account","My Posted Jobs","My Applied Jobs","My Favourite Jobs","Change Password","Terms and Conditions","Feedback","Log Out"]
     
     
     override func viewDidLoad() {
@@ -49,7 +49,7 @@ class AccountViewController: UIViewController , UITableViewDelegate , UITableVie
         if UserDefaults.standard.isLoggedIn() {
             
             userData = Helper.setUserDetailsInUsermodel(details: UserDefaults.standard.getUserDetails())
-            profileImg.sd_setImage(with: URL(string: userData.user_img ?? ""), placeholderImage: UIImage(named: "placeholder"))
+            profileImg.sd_setImage(with: URL(string: UserDefaults.standard.getProfileImg() ?? ""), placeholderImage: UIImage(named: "placeholder"))
             name.text = userData.user_name ?? ""
             designation.text = userData.user_type ?? ""
         }
@@ -95,14 +95,14 @@ class AccountViewController: UIViewController , UITableViewDelegate , UITableVie
             self.navigationController?.pushViewController(profile!, animated: true)
             break
         case 1:
-            let profile = self.storyboard?.instantiateViewController(withIdentifier: "my_classified_job") as! MyClassifiedJobViewController
-            profile.isFrom = "posted-job"
+            let profile = self.storyboard?.instantiateViewController(withIdentifier: "postedjob") as! PostedJobViewController
+            profile.isFromAccount = true
             self.navigationController?.pushViewController(profile, animated: true)
             break
         case 2:
             let profile = self.storyboard?.instantiateViewController(withIdentifier: "my_classified_job") as! MyClassifiedJobViewController
-            profile.isFrom = "classified-job"
             self.navigationController?.pushViewController(profile, animated: true)
+            
             break
         case 3:
             let profile = self.storyboard?.instantiateViewController(withIdentifier: "favourite") as! FavouriteViewController
@@ -113,7 +113,8 @@ class AccountViewController: UIViewController , UITableViewDelegate , UITableVie
             self.navigationController?.pushViewController(profile!, animated: true)
             break
         case 5:
-            Helper.showSnackBar(with: "Under Development")
+            let profile = self.storyboard?.instantiateViewController(withIdentifier: "terms")
+            self.navigationController?.pushViewController(profile!, animated: true)
             break
         case 6:
             let profile = self.storyboard?.instantiateViewController(withIdentifier: "feedback")
@@ -147,6 +148,5 @@ class AccountViewController: UIViewController , UITableViewDelegate , UITableVie
         }
         
     }
-
     
 }

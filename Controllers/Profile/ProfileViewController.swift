@@ -47,7 +47,7 @@ class ProfileViewController: UIViewController , CountryListDelegate{
         country_id = userData.country_id ?? ""
         state_id = userData.state_id ?? ""
         city_id = userData.city_id ?? ""
-        profileImg.sd_setImage(with: URL(string: userData.user_img ?? ""), placeholderImage: UIImage(named: "placeholder"))
+        profileImg.sd_setImage(with: URL(string: UserDefaults.standard.getProfileImg() ?? ""), placeholderImage: UIImage(named: "placeholder"))
         
         profileName.text = userData.user_name ?? ""
         emailField.text = userData.user_email  ?? ""

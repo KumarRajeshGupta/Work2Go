@@ -16,6 +16,7 @@ enum UserDefaultsKeys : String {
     case userID
     case device_token
     case device_id
+    case profileImg
 }
 
 extension UserDefaults{
@@ -34,8 +35,8 @@ extension UserDefaults{
         set(value, forKey: UserDefaultsKeys.device_token.rawValue)
         //synchronize()
     }
-    func getToken()-> String {
-        return string(forKey: UserDefaultsKeys.device_token.rawValue)!
+    func getToken()-> String? {
+        return string(forKey: UserDefaultsKeys.device_token.rawValue)
     }
     func setDeviceID(value: String) {
         set(value, forKey: UserDefaultsKeys.device_id.rawValue)
@@ -43,6 +44,13 @@ extension UserDefaults{
     }
     func getDeviceID()-> String {
         return string(forKey: UserDefaultsKeys.device_id.rawValue)!
+    }
+    func setProfileImg(value: String) {
+        set(value, forKey: UserDefaultsKeys.profileImg.rawValue)
+        //synchronize()
+    }
+    func getProfileImg()-> String? {
+        return string(forKey: UserDefaultsKeys.profileImg.rawValue)
     }
       
     //MARK: Check Login

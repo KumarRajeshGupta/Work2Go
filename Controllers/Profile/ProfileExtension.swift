@@ -57,9 +57,13 @@ extension ProfileViewController : UINavigationControllerDelegate,UIImagePickerCo
         
         let imgData1 = UIImageJPEGRepresentation(profileImg.image!, 0.2)!
         
-        service.getResponseUploadImageApi(parametrs: params as NSDictionary, imgData: imgData1) { (results) in
+        service.getResponseUploadImageApi(parametrs: params as NSDictionary, imgData: imgData1, imagekey: "file", serviceName: "edit_image1.php") { (results) in
             
-            print(results)
+            let status = results["status"] as? String ?? ""
+            if status == "1"{
+                print(results)
+                UserDefaults.standard.setProfileImg(value: results["message"] as? String ?? "")
+            }
         }
  
     }
